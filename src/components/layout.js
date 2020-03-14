@@ -48,6 +48,7 @@ const Layout = ({ children }) => {
             >
               <main>{children}</main>
               <footer style={{ paddingTop: 10 }}>
+                {/* github link etc. */}
                 © {new Date().getFullYear()}, Built with
                 {` `}
                 <a href="https://www.gatsbyjs.org">Gatsby</a>
