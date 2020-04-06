@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 
 import Layout from '../components/layout'
-import Image from '../components/image'
 import SEO from '../components/seo'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-import { Button, TextField } from '@material-ui/core'
+import { Button, Checkbox, FormControlLabel, TextField } from '@material-ui/core'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -66,14 +65,32 @@ const IndexPage = () => {
     console.log("Token JSON");
     console.log(json);
     const { token } = json;
+    console.log(token);
 
     return token;
   }
 
   const [apiKey, setApiKey] = useState("");
   const [apiSecret, setApiSecret] = useState("");
+
   const [accessToken, setAccessToken] = useState(null);
   const [activities, setActivities] = useState(null);
+
+  const [selectedActivities, setSelectedActivities] = useState([]);
+
+  const handleActivityChecked = (event, id) => {
+    console.log(selectedActivities);
+    if (event.target.checked) {
+      setSelectedActivities(
+        selectedActivities => [...selectedActivities, id]
+      )
+    }
+    else {
+      setSelectedActivities(
+        selectedActivities.filter((someId) => { return someId !== id; }));
+    }
+    console.log(selectedActivities)
+  }
 
 
   // should handleSubmit be async and call out to await? Probably not, we'd likely need a load state
@@ -84,7 +101,7 @@ const IndexPage = () => {
     if (!accessToken) {
       // await?
       setAccessToken(await getAccessToken(apiKey, apiSecret));
-      console.log("Set Access Token");
+      console.log(`access Token inside ${accessToken}`);
     }
 
     console.log(`access Token ${accessToken}`);
@@ -118,7 +135,20 @@ const IndexPage = () => {
 
         {/* activity component */}
         {console.log(activities)}
-        {(activities || []).map(({ id, name }) => { return 1; })}
+        <div>
+          {(activities || []).map(({ id, name, color }) => {
+            const myStyle = { color: color };
+            console.log(myStyle);
+            return <FormControlLabel
+              key={id}
+              control={
+                <Checkbox style={myStyle} />
+              }
+              label={name}
+              onChange={e => handleActivityChecked(e, id)}
+            />;
+          })}
+        </div>
 
         {/* Restrict to activity */}
 
@@ -129,7 +159,7 @@ const IndexPage = () => {
 
       {/* print report */}
 
-    </Layout>
+    </Layout >
   )
 }
 
