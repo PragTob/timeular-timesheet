@@ -27,13 +27,14 @@ const IndexPage = () => {
   const BASE_TIMEULAR_API_URL = "https://api.timeular.com/api/v2"
 
   const fetchActivites = async (token) => {
-    console.log("doing request");
+    console.log("feetching activities");
     const response = await fetch(`${BASE_TIMEULAR_API_URL}/activities`, {
       headers: apiHeaders(token),
       method: "GET"
     });
-    console.log("waiting for json");
+    console.log("waiting for activities json");
     const json = await response.json();
+    console.log("Activities JSON");
     console.log(json);
     const { activities } = json;
 
@@ -43,7 +44,7 @@ const IndexPage = () => {
   const apiHeaders = (token) => {
     return {
       "content-type": "application/json",
-      "Authorizaiton": `Bearer ${token}`
+      "Authorization": `Bearer ${token}`
     }
   }
 
@@ -52,16 +53,17 @@ const IndexPage = () => {
       apiKey: key,
       apiSecret: secret
     };
-    console.log("doing request");
+    console.log("doing access token request");
     const response = await fetch(`${BASE_TIMEULAR_API_URL}/developer/sign-in`, {
       headers: {
         "content-type": "application/json",
       },
-      body: data,
+      body: JSON.stringify(data),
       method: "POST"
     });
     console.log("waiting for json");
     const json = await response.json();
+    console.log("Token JSON");
     console.log(json);
     const { token } = json;
 
@@ -78,12 +80,14 @@ const IndexPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Submitting");
-    console.log(apiKey);
     //  where to store/get access token from?
     if (!accessToken) {
       // await?
       setAccessToken(await getAccessToken(apiKey, apiSecret));
+      console.log("Set Access Token");
     }
+
+    console.log(`access Token ${accessToken}`);
 
 
     accessToken || setAccessToken(await getAccessToken(apiKey, apiSecret));
