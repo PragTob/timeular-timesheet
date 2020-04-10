@@ -1,6 +1,7 @@
 function report(timeEntries) {
   return {
-    totalDuration: totalDuration(timeEntries)
+    totalDuration: totalDuration(timeEntries),
+    days: calculateDays(timeEntries)
   };
 }
 
@@ -17,7 +18,7 @@ function totalDuration(timeEntries) {
 function calculateDuration(timeEntries) {
   return timeEntries
     .map(({ duration: { startedAt, stoppedAt } }) => {
-      return parseTime(stoppedAt) - parseTime(startedAt);
+      return parseTimeToMilliseconds(stoppedAt) - parseTimeToMilliseconds(startedAt);
     })
     .reduce((time, sum) => time + sum, 0);
 }
@@ -30,7 +31,6 @@ function floatFormat(duration) {
 function hourFormat(duration) {
   const seconds = duration / 1000;
   const minutes = div(seconds, 60);
-  console.log(minutes);
   const hours = div(minutes, 60);
 
   const leftoverMinutes = minutes % 60;
@@ -47,8 +47,54 @@ function padNumber(number) {
   return number.toString().padStart(2, '0')
 }
 
-function parseTime(time) {
-  return Date.parse(time);
+function parseTimeToMilliseconds(timeString) {
+  return Date.parse(timeString);
+}
+
+function parseTimeToDate(timeString) {
+  return new Date(timeString);
+}
+
+function calculateDays(timeEntries) {
+  const sortedTimeEntries =
+    timeEntries
+      .map(normalizeAPITimeEntry)
+  // .sort(entryA, entryB => entryA.from.getTime() - entryB.from.getTime());
+
+  const byDate = groupBy(sortedTimeEntries, ({ from }) => {
+    return new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  });
+
+  return Array.from(byDate.entries(), ([date, entries]) => {
+    return {
+      date: date,
+      entries: entries
+    }
+  });
+
+}
+
+function normalizeAPITimeEntry({ activity: { name }, duration: { startedAt, stoppedAt } }) {
+  return {
+    name: name,
+    from: parseTimeToDate(startedAt),
+    until: parseTimeToDate(stoppedAt)
+  };
+}
+
+// I miss lodash/underscore
+function groupBy(list, keyGetter) {
+  const map = new Map();
+  list.forEach((item) => {
+    const key = keyGetter(item);
+    const collection = map.get(key);
+    if (!collection) {
+      map.set(key, [item]);
+    } else {
+      collection.push(item);
+    }
+  });
+  return map;
 }
 
 export default report;
