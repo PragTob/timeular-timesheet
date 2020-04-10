@@ -24,6 +24,9 @@
     "typeface-roboto": "0.0.54"
   },
   "devDependencies": {
+    "babel-jest": "^25.3.0",
+    "babel-preset-gatsby": "^0.3.1",
+    "jest": "^25.3.0",
     "prettier": "^1.19.1"
   },
   "keywords": [
@@ -36,7 +39,7 @@
     "format": "prettier --write src/**/*.{js,jsx}",
     "start": "npm run develop",
     "serve": "gatsby serve",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\""
+    "test": "jest"
   },
   "repository": {
     "type": "git",
