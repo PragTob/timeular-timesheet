@@ -26,15 +26,11 @@ const IndexPage = () => {
   const BASE_TIMEULAR_API_URL = "https://api.timeular.com/api/v2"
 
   const fetchActivites = async (token) => {
-    console.log("feetching activities");
     const response = await fetch(`${BASE_TIMEULAR_API_URL}/activities`, {
       headers: apiHeaders(token),
       method: "GET"
     });
-    console.log("waiting for activities json");
     const json = await response.json();
-    console.log("Activities JSON");
-    console.log(json);
     const { activities } = json;
 
     return activities;
@@ -52,7 +48,6 @@ const IndexPage = () => {
       apiKey: key,
       apiSecret: secret
     };
-    console.log("doing access token request");
     const response = await fetch(`${BASE_TIMEULAR_API_URL}/developer/sign-in`, {
       headers: {
         "content-type": "application/json",
@@ -60,26 +55,43 @@ const IndexPage = () => {
       body: JSON.stringify(data),
       method: "POST"
     });
-    console.log("waiting for json");
     const json = await response.json();
-    console.log("Token JSON");
-    console.log(json);
     const { token } = json;
-    console.log(token);
 
     return token;
   }
 
+  const fetchTimeEntries = async (token, from, until) => {
+    const stoppedAfter = `${from}T00:00:00.000`;
+    const startedBefore = `${until}T23:59:59.999`;
+
+    const response = await fetch(`${BASE_TIMEULAR_API_URL}/time-entries/${stoppedAfter}/${startedBefore}`, {
+      headers: apiHeaders(token),
+      method: "GET"
+    });
+
+    const json = await response.json();
+    console.log(json);
+
+    const { timeEntries } = json;
+
+    return timeEntries;
+  }
+
   const [apiKey, setApiKey] = useState("");
   const [apiSecret, setApiSecret] = useState("");
-
   const [accessToken, setAccessToken] = useState(null);
-  const [activities, setActivities] = useState(null);
 
+  const [fromDate, setFromDate] = useState(null);
+  const [untilDate, setUntilDate] = useState(null);
   const [selectedActivities, setSelectedActivities] = useState([]);
 
+
+  const [activities, setActivities] = useState(null);
+  const [timeEntries, setTimeEntries] = useState(null);
+
+
   const handleActivityChecked = (event, id) => {
-    console.log(selectedActivities);
     if (event.target.checked) {
       setSelectedActivities(
         selectedActivities => [...selectedActivities, id]
@@ -89,26 +101,32 @@ const IndexPage = () => {
       setSelectedActivities(
         selectedActivities.filter((someId) => { return someId !== id; }));
     }
-    console.log(selectedActivities)
   }
 
+  const LOCAL_STORAGE_TOKEN_KEY = "accessToken";
 
   // should handleSubmit be async and call out to await? Probably not, we'd likely need a load state
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Submitting");
-    //  where to store/get access token from?
     if (!accessToken) {
-      // await?
-      setAccessToken(await getAccessToken(apiKey, apiSecret));
-      console.log(`access Token inside ${accessToken}`);
+      const token = await retrieveAccessToken(apiKey, apiSecret);
+      //  doesn't set token immediately?
+      setAccessToken(token);
+      // conditional check for safari private mode? Plus make saving optional?
+      window.localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, token)
+      // console.log(`access Token inside ${accessToken}`);
     }
 
-    console.log(`access Token ${accessToken}`);
+    // console.log(`access Token ${accessToken}`);
 
-
-    accessToken || setAccessToken(await getAccessToken(apiKey, apiSecret));
     activities || setActivities(await fetchActivites(accessToken));
+    timeEntries || setTimeEntries(await fetchTimeEntries(accessToken, fromDate, untilDate))
+  }
+
+  const retrieveAccessToken = async (apiKey, apiSecret) => {
+    return window.localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY) ||
+      await getAccessToken(apiKey, apiSecret);
   }
 
   return (
@@ -127,18 +145,39 @@ const IndexPage = () => {
       {/* TODO: WHat does classes.root do? */}
       <form className={classes.root} noValidate onSubmit={handleSubmit} >
         <div>
+
+          {/* grey out/disable if key is loaded from local storage/give way to clear key */}
           <TextField label="API Key" variant="outlined" value={apiKey} onChange={e => setApiKey(e.target.value)} />
           <TextField label="API Secret" variant="outlined" value={apiSecret} onChange={e => setApiSecret(e.target.value)} />
         </div>
 
         {/* Time from time until */}
 
+        <TextField
+          label="From"
+          type="date"
+          className={classes.textField}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          onChange={e => setFromDate(e.target.value)}
+        />
+
+        <TextField
+          label="Until"
+          type="date"
+          className={classes.textField}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          onChange={e => setUntilDate(e.target.value)}
+        />
+
         {/* activity component */}
-        {console.log(activities)}
+        {/* {console.log(activities)} */}
         <div>
           {(activities || []).map(({ id, name, color }) => {
             const myStyle = { color: color };
-            console.log(myStyle);
             return <FormControlLabel
               key={id}
               control={
@@ -154,6 +193,14 @@ const IndexPage = () => {
 
         <Button variant="contained" color="primary" type="submit">Fetch Activities</Button>
       </form>
+
+      <div>
+        <ul>
+          {(timeEntries || []).map(({ id, activity, duration }) => {
+            return <li key={id}>{activity.name}: {duration.startedAt} - {duration.stoppedAt} </li>
+          })}
+        </ul>
+      </div>
 
       {/* generate report */}
 
