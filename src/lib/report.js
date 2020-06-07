@@ -59,15 +59,15 @@ function calculateDays(timeEntries) {
   const sortedTimeEntries =
     timeEntries
       .map(normalizeAPITimeEntry)
-  // .sort(entryA, entryB => entryA.from.getTime() - entryB.from.getTime());
+      .sort((entryA, entryB) => entryA.from.getTime() - entryB.from.getTime());
 
   const byDate = groupBy(sortedTimeEntries, ({ from }) => {
-    return new Date(from.getFullYear(), from.getMonth(), from.getDate());
+    return new Date(from.getFullYear(), from.getMonth(), from.getDate()).getTime();
   });
 
-  return Array.from(byDate.entries(), ([date, entries]) => {
+  return Array.from(byDate.entries(), ([dateMsecs, entries]) => {
     return {
-      date: date,
+      date: new Date(dateMsecs),
       entries: entries
     }
   });
@@ -75,10 +75,14 @@ function calculateDays(timeEntries) {
 }
 
 function normalizeAPITimeEntry({ activity: { name }, duration: { startedAt, stoppedAt } }) {
+  const from = parseTimeToDate(startedAt);
+  const until = parseTimeToDate(stoppedAt);
+
   return {
     name: name,
-    from: parseTimeToDate(startedAt),
-    until: parseTimeToDate(stoppedAt)
+    from: from,
+    until: until,
+    duration: until.getTime() - from.getTime()
   };
 }
 

@@ -95,7 +95,116 @@ describe("Report", () => {
             {
               name: "Test",
               from: new Date(from),
-              until: new Date(until)
+              until: new Date(until),
+              duration: 6933192
+            }
+          ]
+        }
+      ]);
+    });
+
+    test("two entries same day (appear in correct order)", () => {
+      const from1 = "2020-03-10T10:07:30.000";
+      const until1 = "2020-03-10T12:03:03.192";
+
+      const from2 = "2020-03-10T14:00:00.000";
+      const until2 = "2020-03-10T16:00:00.000";
+
+      const timeEntries = [
+        {
+          activity: {
+            name: "Test2"
+          },
+          duration: {
+            startedAt: from2,
+            stoppedAt: until2
+          }
+        },
+        {
+          activity: {
+            name: "Test"
+          },
+          duration: {
+            startedAt: from1,
+            stoppedAt: until1
+          }
+        }
+      ];
+
+      const days = report(timeEntries).days;
+
+      expect(days).toEqual([
+        {
+          // months are zero based
+          date: new Date(2020, 2, 10),
+          entries: [
+            {
+              name: "Test",
+              from: new Date(from1),
+              until: new Date(until1),
+              duration: 6933192
+            },
+            {
+              name: "Test2",
+              from: new Date(from2),
+              until: new Date(until2),
+              duration: 7200000
+            }
+          ]
+        }
+      ]);
+    });
+
+    test("two entries two days (appear in correct order)", () => {
+      const from1 = "2020-03-10T10:07:30.000";
+      const until1 = "2020-03-10T12:03:03.192";
+
+      const from2 = "2020-03-11T14:00:00.000";
+      const until2 = "2020-03-11T16:00:00.000";
+
+      const timeEntries = [
+        {
+          activity: {
+            name: "Test2"
+          },
+          duration: {
+            startedAt: from2,
+            stoppedAt: until2
+          }
+        },
+        {
+          activity: {
+            name: "Test"
+          },
+          duration: {
+            startedAt: from1,
+            stoppedAt: until1
+          }
+        }
+      ];
+
+      const days = report(timeEntries).days;
+
+      expect(days).toEqual([
+        {
+          date: new Date(2020, 2, 10),
+          entries: [
+            {
+              name: "Test",
+              from: new Date(from1),
+              until: new Date(until1),
+              duration: 6933192
+            }
+          ]
+        },
+        {
+          date: new Date(2020, 2, 11),
+          entries: [
+            {
+              name: "Test2",
+              from: new Date(from2),
+              until: new Date(until2),
+              duration: 7200000
             }
           ]
         }
