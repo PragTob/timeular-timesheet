@@ -63,6 +63,25 @@ describe("Report", () => {
   });
 
   describe(".days", () => {
+    const activity1Duration = {
+      "floatFormat": "1.93h",
+      "hourFormat": "1:55:33h",
+      "milliseconds": 6933192,
+    }
+
+    const activity2Duration = {
+      "floatFormat": "2.00h",
+      "hourFormat": "2:00:00h",
+      "milliseconds": 7200000,
+    }
+
+    const activity1And2Duration = {
+      "floatFormat": "3.93h",
+      "hourFormat": "3:55:33h",
+      "milliseconds": 14133192
+    }
+
+
     test("no entries no days", () => {
       const days = report([]).days;
 
@@ -91,6 +110,7 @@ describe("Report", () => {
         {
           // months are zero based
           date: new Date(2020, 2, 10),
+          duration: activity1Duration,
           entries: [
             {
               name: "Test",
@@ -137,6 +157,7 @@ describe("Report", () => {
         {
           // months are zero based
           date: new Date(2020, 2, 10),
+          duration: activity1And2Duration,
           entries: [
             {
               name: "Test",
@@ -188,6 +209,7 @@ describe("Report", () => {
       expect(days).toEqual([
         {
           date: new Date(2020, 2, 10),
+          duration: activity1Duration,
           entries: [
             {
               name: "Test",
@@ -199,6 +221,7 @@ describe("Report", () => {
         },
         {
           date: new Date(2020, 2, 11),
+          duration: activity2Duration,
           entries: [
             {
               name: "Test2",

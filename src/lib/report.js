@@ -55,6 +55,20 @@ function parseTimeToDate(timeString) {
   return new Date(timeString);
 }
 
+function duration(entries) {
+  const myDuration = entries.reduce((sum, { duration }) => sum + duration, 0)
+
+  return durationFormat(myDuration);
+}
+
+function durationFormat(duration) {
+  return {
+    milliseconds: duration,
+    hourFormat: hourFormat(duration),
+    floatFormat: floatFormat(duration)
+  };
+}
+
 function calculateDays(timeEntries) {
   const sortedTimeEntries =
     timeEntries
@@ -68,6 +82,7 @@ function calculateDays(timeEntries) {
   return Array.from(byDate.entries(), ([dateMsecs, entries]) => {
     return {
       date: new Date(dateMsecs),
+      duration: duration(entries),
       entries: entries
     }
   });
