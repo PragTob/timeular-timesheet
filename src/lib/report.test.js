@@ -6,8 +6,8 @@ describe("Report", () => {
       const result = report([]).totalDuration;
 
       expect(result.milliseconds).toEqual(0);
-      expect(result.hourFormat).toEqual("0:00:00h");
-      expect(result.floatFormat).toEqual("0.00h");
+      expect(result.hourFormat).toEqual("0:00:00");
+      expect(result.floatFormat).toEqual("0.00");
     });
 
     test("time of the activity with one activity", () => {
@@ -26,8 +26,8 @@ describe("Report", () => {
       const result = report(timeEntries).totalDuration;
 
       expect(result.milliseconds).toEqual(6933192);
-      expect(result.hourFormat).toEqual("1:55:33h");
-      expect(result.floatFormat).toEqual("1.93h");
+      expect(result.hourFormat).toEqual("1:55:33");
+      expect(result.floatFormat).toEqual("1.93");
 
     });
 
@@ -56,28 +56,28 @@ describe("Report", () => {
       const result = report(timeEntries).totalDuration;
 
       expect(result.milliseconds).toEqual(7113192);
-      expect(result.hourFormat).toEqual("1:58:33h");
-      expect(result.floatFormat).toEqual("1.98h");
+      expect(result.hourFormat).toEqual("1:58:33");
+      expect(result.floatFormat).toEqual("1.98");
 
     });
   });
 
   describe(".days", () => {
     const activity1Duration = {
-      "floatFormat": "1.93h",
-      "hourFormat": "1:55:33h",
+      "floatFormat": "1.93",
+      "hourFormat": "1:55:33",
       "milliseconds": 6933192,
     }
 
     const activity2Duration = {
-      "floatFormat": "2.00h",
-      "hourFormat": "2:00:00h",
+      "floatFormat": "2.00",
+      "hourFormat": "2:00:00",
       "milliseconds": 7200000,
     }
 
     const activity1And2Duration = {
-      "floatFormat": "3.93h",
-      "hourFormat": "3:55:33h",
+      "floatFormat": "3.93",
+      "hourFormat": "3:55:33",
       "milliseconds": 14133192
     }
 
