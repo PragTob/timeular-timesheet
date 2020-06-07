@@ -17,6 +17,20 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const groupBy = (list, keyGetter) => {
+  const map = new Map();
+  list.forEach((item) => {
+    const key = keyGetter(item);
+    const collection = map.get(key);
+    if (!collection) {
+      map.set(key, [item]);
+    } else {
+      collection.push(item);
+    }
+  });
+  return map;
+}
+
 const IndexPage = () => {
 
   const classes = useStyles()
@@ -129,6 +143,41 @@ const IndexPage = () => {
       await getAccessToken(apiKey, apiSecret);
   }
 
+  const timeReportData = (entries, filterActivities) => {
+    // debugger;
+    const relevantEntries = entries.filter(entry => {
+      filterActivities.includes(entry.activity.id)
+    })
+
+    relevantEntries.map(entry => {
+      entry.startedAt = new Date(entry.duration.startedAt);
+      entry.stoppedAt = new Date(entry.duration.stoppedAt);
+
+      entry.duration = entry.stoppedAt - entry.startedAt
+
+      return entry;
+    })
+
+    const groupedEntries = groupBy(relevantEntries, entry => {
+      const started = entry.startedAt
+
+      return new Date(started.getFullYear(), started.getMonth(), started.getDay()).getTime()
+    })
+
+    console.log(groupedEntries);
+
+    const dayList =
+      Array.from(groupedEntries.entries()).map(([day, activities]) => {
+
+        return {
+          day: day,
+          activities: activities
+        };
+      });
+
+    // debugger;
+  }
+
   return (
     <Layout>
       <SEO title="Home" />
@@ -201,6 +250,8 @@ const IndexPage = () => {
           })}
         </ul>
       </div>
+
+      {timeReportData((timeEntries || []), selectedActivities)}
 
       {/* generate report */}
 
