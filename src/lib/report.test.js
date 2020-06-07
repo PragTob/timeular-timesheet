@@ -62,6 +62,41 @@ describe("Report", () => {
     });
   });
 
+  describe("filtering", () => {
+
+    const activityId = "1234"
+
+    const timeEntries = [
+      {
+        activity: { id: activityId },
+        duration: {
+          startedAt: "2020-03-10T10:07:30.000",
+          stoppedAt: "2020-03-10T12:03:03.192"
+        }
+      }
+    ]
+
+
+    test("no filtering occurs when empty array is passed", () => {
+      const result = report(timeEntries, [])
+
+      expect(result.days.length).toEqual(1)
+    })
+
+    test("filtering out the only activity", () => {
+      const result = report(timeEntries, ["something-else"])
+
+      expect(result.days).toEqual([])
+    })
+
+    test("filter matches the activity", () => {
+      const result = report(timeEntries, [activityId])
+
+      expect(result.days.length).toEqual(1)
+    })
+
+  })
+
   describe(".days", () => {
     const activity1Duration = {
       "floatFormat": "1.93",

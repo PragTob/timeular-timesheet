@@ -1,12 +1,21 @@
 import padNumber from "./formatting"
 
-function report(timeEntries) {
-  const days = calculateDays(timeEntries);
+function report(timeEntries, selectedActivites = []) {
+  console.log(selectedActivites)
+  const relevantEntries = selectedActivites.length > 0 ? filterByActivities(timeEntries, selectedActivites) : timeEntries
+
+  const days = calculateDays(relevantEntries);
 
   return {
     totalDuration: totalDuration(days),
     days: days
   };
+}
+
+function filterByActivities(entries, activites) {
+  return entries.filter(entry => {
+    return activites.includes(entry.activity.id)
+  })
 }
 
 function totalDuration(days) {

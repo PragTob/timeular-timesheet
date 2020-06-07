@@ -7,6 +7,10 @@ import { makeStyles } from '@material-ui/core/styles'
 
 import { Button, Checkbox, FormControlLabel, TextField } from '@material-ui/core'
 
+import report from "../lib/report"
+import csvReport from "../lib/csv_report"
+
+
 const useStyles = makeStyles(theme => ({
   root: {
     width: '100%',
@@ -128,6 +132,12 @@ const IndexPage = () => {
     return window.localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY) ||
       await getAccessToken(apiKey, apiSecret);
   }
+
+  const data = report(timeEntries || [], selectedActivities);
+  const csv = csvReport(data);
+
+  console.log(csv);
+
 
   return (
     <Layout>
